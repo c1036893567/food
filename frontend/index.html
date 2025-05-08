@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>大学生吃饭选择困难症拯救器</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #fff5e6;
+        font-family: "Comic Sans MS", "Marker Felt", "微软雅黑", sans-serif;
+      }
+      .header {
+        background-color: #ff9966;
+        color: white;
+        padding: 20px 0;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+      .form-container {
+        background-color: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+      .result-container {
+        display: none;
+        background-color: #e6f7ff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+      .progress-container {
+        display: none;
+        margin: 20px 0;
+      }
+      .progress-bar {
+        background-color: #ff9966;
+      }
+      .funny-icon {
+        font-size: 2rem;
+        margin: 0 10px;
+      }
+      .mood-selector img {
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border-radius: 50%;
+      }
+      .mood-selector img:hover,
+      .mood-selector img.selected {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #ff9966;
+      }
+      .funny-input {
+        border-radius: 50px;
+        padding: 10px 20px;
+        border: 2px dashed #ff9966;
+      }
+      .funny-btn {
+        background-color: #ff9966;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: bold;
+        transition: all 0.3s;
+      }
+      .funny-btn:hover {
+        background-color: #ff7733;
+        transform: scale(1.05);
+      }
+      .result-title {
+        color: #ff7733;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .result-food {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ff5500;
+        margin: 20px 0;
+      }
+      .funny-fact {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+      }
+      .emoji {
+        font-size: 1.5rem;
+      }
+
+      /* 改进滑块样式 */
+      .form-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #ff9966;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .form-range::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-range::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #ff9966;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .form-range::-moz-range-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .form-range::-webkit-slider-runnable-track {
+        height: 8px;
+        background: #ddd;
+        border-radius: 4px;
+      }
+
+      .form-range::-moz-range-track {
+        height: 8px;
+        background: #ddd;
+        border-radius: 4px;
+      }
+
+      .budget-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+      }
+
+      .budget-label {
+        font-size: 0.8rem;
+        color: #666;
+      }
+      /* 添加饥饿程度滑块的特殊样式 */
+      .hunger-labels {
+        margin-top: 5px;
+      }
+      .hunger-labels span {
+        width: 20px;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #666;
+      }
+      .hunger-text {
+        margin-top: -5px;
+      }
+      .hunger-text small {
+        flex: 1;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #ff7733;
+      }
+      /* 在<style>标签内添加 */
+      .result-tip {
+        font-weight: bold;
+        color: #ff5500;
+        font-style: normal;
+      }
+
+      .result-tip-content {
+        font-style: italic;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header text-center">
+        <h1>
+          <span class="emoji">🤯</span> 大学生吃饭选择困难症拯救器
+          <span class="emoji">🍔</span>
+        </h1>
+        <p class="lead">还在为吃什么发愁？让本神器拯救你的选择困难症！</p>
+      </div>
+
+      <div class="form-container">
+        <h3 class="text-center mb-4">
+          <span class="emoji">🔍</span> 告诉我你的情况
+          <span class="emoji">📝</span>
+        </h3>
+
+        <div class="mb-3">
+          <label for="budget" class="form-label">💰 今日预算（元）</label>
+          <input
+            type="range"
+            class="form-range funny-input"
+            min="0"
+            max="50"
+            step="1"
+            id="budget"
+            value="15"
+          />
+          <div class="budget-labels">
+            <span class="budget-label">0元</span>
+            <span class="budget-label">10元</span>
+            <span class="budget-label">20元</span>
+            <span class="budget-label">30元</span>
+            <span class="budget-label">40元</span>
+            <span class="budget-label">50元</span>
+          </div>
+          <p class="funny-fact">
+            当前预算: <span id="budgetValue">15</span>元
+            <span class="emoji" id="budgetEmoji">😊</span>
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">😊 今天心情如何？</label>
+          <div class="mood-selector text-center">
+            <img
+              src="https://cdn.jsdelivr.net/npm/twemoji@11.0.1/2/svg/1f62d.svg"
+              data-mood="sad"
+              alt="难过"
+            />
+            <img
+              src="https://cdn.jsdelivr.net/npm/twemoji@11.0.1/2/svg/1f614.svg"
+              data-mood="depressed"
+              alt="抑郁"
+            />
+            <img
+              src="https://cdn.jsdelivr.net/npm/twemoji@11.0.1/2/svg/1f610.svg"
+              data-mood="normal"
+              alt="一般"
+            />
+            <img
+              src="https://cdn.jsdelivr.net/npm/twemoji@11.0.1/2/svg/1f60a.svg"
+              data-mood="happy"
+              alt="开心"
+            />
+            <img
+              src="https://cdn.jsdelivr.net/npm/twemoji@11.0.1/2/svg/1f60d.svg"
+              data-mood="excited"
+              alt="兴奋"
+            />
+          </div>
+          <input type="hidden" id="mood" value="normal" />
+        </div>
+
+        <div class="mb-3">
+          <label for="weather" class="form-label">☀️ 今天天气</label>
+          <select class="form-select funny-input" id="weather">
+            <option value="sunny">阳光明媚</option>
+            <option value="cloudy">多云转晴</option>
+            <option value="rainy">阴雨绵绵</option>
+            <option value="hot">热到融化</option>
+            <option value="cold">冷到发抖</option>
+            <option value="windy">狂风大作</option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="lastClass" class="form-label">📚 上一节课</label>
+            <select class="form-select funny-input" id="lastClass">
+              <option value="none">没有课</option>
+              <option value="math">高数/线代</option>
+              <option value="physics">大学物理</option>
+              <option value="programming">编程课</option>
+              <option value="english">英语课</option>
+              <option value="philosophy">马原/毛概</option>
+              <option value="experiment">实验课</option>
+              <option value="pe">体育课</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="nextClass" class="form-label">📖 下一节课</label>
+            <select class="form-select funny-input" id="nextClass">
+              <option value="none">没有课</option>
+              <option value="math">高数/线代</option>
+              <option value="physics">大学物理</option>
+              <option value="programming">编程课</option>
+              <option value="english">英语课</option>
+              <option value="philosophy">马原/毛概</option>
+              <option value="experiment">实验课</option>
+              <option value="pe">体育课</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="hunger" class="form-label">🍽️ 饥饿程度</label>
+          <input
+            type="range"
+            class="form-range funny-input"
+            min="1"
+            max="10"
+            id="hunger"
+            value="5"
+          />
+          <div class="d-flex justify-content-between hunger-labels">
+            <span>10</span>
+            <span>9</span>
+            <span>8</span>
+            <span>7</span>
+            <span>6</span>
+            <span>5</span>
+            <span>4</span>
+            <span>3</span>
+            <span>2</span>
+            <span>1</span>
+          </div>
+          <div class="d-flex justify-content-between hunger-text">
+            <small>饿到升天</small>
+            <small>能吃一头牛</small>
+            <small>正常饥饿</small>
+            <small>不太饿</small>
+            <small>完全不饿</small>
+          </div>
+          <p class="funny-fact mt-2">
+            当前状态: <span id="hungerStatus">正常饥饿</span>
+            <span id="hungerEmoji">😋</span>
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <label for="energy" class="form-label">⚡ 能量需求</label>
+          <input
+            type="range"
+            class="form-range funny-input"
+            min="1"
+            max="10"
+            id="energy"
+            value="5"
+          />
+          <div class="d-flex justify-content-between">
+            <span>只想躺平</span>
+            <span>需要提神</span>
+            <span>正常需求</span>
+            <span>活力满满</span>
+            <span>准备跑马拉松</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="special" class="form-label">🎯 特殊需求</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="vegetarian"
+              id="vegetarian"
+            />
+            <label class="form-check-label" for="vegetarian"
+              >我是素食主义者</label
+            >
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="spicy"
+              id="spicy"
+            />
+            <label class="form-check-label" for="spicy">我想吃辣的</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value="quick"
+              id="quick"
+            />
+            <label class="form-check-label" for="quick">我要快速解决</label>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button id="generateBtn" class="btn funny-btn">
+            <span class="emoji">✨</span> 生成我的专属美食
+            <span class="emoji">🍽️</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="progress-container" id="progressContainer">
+        <div class="progress">
+          <div
+            id="progressBar"
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style="width: 0%"
+          ></div>
+        </div>
+        <p class="text-center mt-2" id="progressText">
+          正在分析你的选择困难症程度...
+        </p>
+      </div>
+
+      <div class="result-container" id="resultContainer">
+        <h3 class="result-title text-center">
+          <span class="emoji">🎉</span> 你的专属美食推荐
+          <span class="emoji">🍴</span>
+        </h3>
+        <div class="text-center">
+          <p class="result-food" id="resultFood">黄焖鸡米饭</p>
+          <p id="resultReason" class="funny-fact">
+            根据你的预算15元、心情一般和天气阳光明媚，这道菜最适合你！
+          </p>
+          <p class="funny-fact">
+            <span class="result-tip">小贴士：</span>
+            <span class="result-tip-content" id="resultTip"
+              >记得加份米饭，不然会饿！</span
+            >
+          </p>
+          <button id="tryAgainBtn" class="btn funny-btn mt-3">
+            <span class="emoji">🔄</span> 再试一次 <span class="emoji">🤪</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 预算滑块事件
+      document.getElementById("budget").addEventListener("input", function () {
+        updateBudgetDisplay(this.value);
+      });
+
+      // 更新预算显示的函数
+      function updateBudgetDisplay(budget) {
+        document.getElementById("budgetValue").textContent = budget;
+
+        // 根据预算改变表情
+        let emoji = "😊";
+        if (budget < 5) emoji = "😱";
+        else if (budget < 10) emoji = "😅";
+        else if (budget > 30) emoji = "💰";
+        else if (budget > 40) emoji = "🤑";
+
+        document.getElementById("budgetEmoji").textContent = emoji;
+      }
+
+      // 心情选择器事件
+      const moodImages = document.querySelectorAll(".mood-selector img");
+      moodImages.forEach((img) => {
+        img.addEventListener("click", function () {
+          moodImages.forEach((i) => i.classList.remove("selected"));
+          this.classList.add("selected");
+          document.getElementById("mood").value = this.dataset.mood;
+        });
+      });
+
+      // 默认选择"一般"心情
+      moodImages[2].classList.add("selected");
+
+      // 饥饿程度滑块事件
+      document.getElementById("hunger").addEventListener("input", function () {
+        const hunger = parseInt(this.value);
+        let status = "";
+        let emoji = "";
+
+        if (hunger === 1) {
+          status = "饿到升天";
+          emoji = "😫";
+        } else if (hunger <= 3) {
+          status = "能吃一头牛";
+          emoji = "🐮";
+        } else if (hunger <= 5) {
+          status = "有点饿";
+          emoji = "😋";
+        } else if (hunger <= 7) {
+          status = "正常饥饿";
+          emoji = "🤤";
+        } else if (hunger <= 9) {
+          status = "不太饿";
+          emoji = "🤔";
+        } else {
+          status = "完全不饿";
+          emoji = "😌";
+        }
+
+        document.getElementById("hungerStatus").textContent = status;
+        document.getElementById("hungerEmoji").textContent = emoji;
+      });
+
+      // 生成按钮事件
+      document
+        .getElementById("generateBtn")
+        .addEventListener("click", async function () {
+          // 确保获取最新的表单值
+          const currentBudget = document.getElementById("budget").value;
+          updateBudgetDisplay(currentBudget);
+
+          // 显示进度条
+          document.getElementById("progressContainer").style.display = "block";
+          document.querySelector(".form-container").style.display = "none";
+
+          // 模拟进度条
+          let progress = 0;
+          const progressBar = document.getElementById("progressBar");
+          const progressText = document.getElementById("progressText");
+          const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 100) progress = 100;
+            progressBar.style.width = progress + "%";
+
+            // 更新进度文本
+            if (progress < 30) {
+              progressText.textContent = "正在分析你的选择困难症程度...";
+            } else if (progress < 60) {
+              progressText.textContent = "正在计算食堂排队时间...";
+            } else if (progress < 90) {
+              progressText.textContent = "正在考虑宿管阿姨的脸色...";
+            } else {
+              progressText.textContent = "差点被外卖小哥打断...";
+            }
+
+            if (progress === 100) {
+              clearInterval(interval);
+            }
+          }, 200);
+
+          try {
+            // 收集表单数据
+            const formData = {
+              budget: parseInt(document.getElementById("budget").value),
+              mood: document.getElementById("mood").value,
+              weather: document.getElementById("weather").value,
+              lastClass: document.getElementById("lastClass").value,
+              nextClass: document.getElementById("nextClass").value,
+              hunger: parseInt(document.getElementById("hunger").value),
+              energy: parseInt(document.getElementById("energy").value),
+              vegetarian: document.getElementById("vegetarian").checked,
+              spicy: document.getElementById("spicy").checked,
+              quick: document.getElementById("quick").checked,
+            };
+
+            // 发送请求到后端
+            const response = await fetch(
+              "http://172.20.10.2:8000/api/recommend-food",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error("网络响应不正常");
+            }
+
+            const result = await response.json();
+
+            // 显示结果
+            showResult(result);
+          } catch (error) {
+            console.error("获取推荐失败:", error);
+            // 显示错误信息
+            document.getElementById("progressContainer").style.display = "none";
+            document.querySelector(".form-container").style.display = "block";
+            alert("获取推荐失败，请稍后再试: " + error.message);
+          }
+        });
+
+      // 显示结果
+      function showResult(data) {
+        document.getElementById("progressContainer").style.display = "none";
+        document.getElementById("resultContainer").style.display = "block";
+
+        // 显示结果
+        document.getElementById("resultFood").textContent =
+          data.food || "未知美食";
+        document.getElementById("resultReason").textContent =
+          data.reason || "AI正在思考...";
+        document.getElementById("resultTip").textContent =
+          data.tip || "小贴士：好好享受你的美食吧！";
+      }
+
+      // 再试一次按钮
+      document
+        .getElementById("tryAgainBtn")
+        .addEventListener("click", function () {
+          // 隐藏结果容器
+          document.getElementById("resultContainer").style.display = "none";
+          // 显示表单容器
+          document.querySelector(".form-container").style.display = "block";
+
+          // 确保预算显示更新
+          const currentBudget = document.getElementById("budget").value;
+          updateBudgetDisplay(currentBudget);
+        });
+
+      // 初始化预算显示
+      updateBudgetDisplay(document.getElementById("budget").value);
+    </script>
+  </body>
+</html>
