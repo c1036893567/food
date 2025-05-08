@@ -166,5 +166,5 @@ if __name__ == "__main__":
         "main:app",  # "文件名:FastAPI应用变量名"
         host="0.0.0.0",
         port=8000,
-        reload=True  # 开发时启用热重载
+        reload=False  # 开发时启用热重载
     )
